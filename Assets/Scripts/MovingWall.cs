@@ -25,14 +25,15 @@ public class MovingWall : MonoBehaviour
 
     private void Slide()
     {
-        positionAlongLoop = (positionAlongLoop + (1 / 2f * speedInGridUnitsPerSecond) / pathVector.magnitude * Time.deltaTime) % 1;
+        positionAlongLoop = (positionAlongLoop +
+                             (1 / 2f * speedInGridUnitsPerSecond) / pathVectorInGridUnits.magnitude * Time.deltaTime) %
+                            1;
         Vector2 delta = (0.5f - 0.5f * Mathf.Cos(positionAlongLoop * 2 * Mathf.PI)) * pathVectorInGridUnits;
         transform.position = birthPlace + delta * MovingWall.GRID_UNITS_IN_UNITY_UNITS;
     }
 
     private void Rotate()
     {
-        transform.rotation.z += 360f * rotationsPerSecond * Time.deltaTime;
-        transform.rotation.z %= 360;
+        transform.Rotate(Vector3.forward, 360f * rotationsPerSecond * Time.deltaTime);
     }
 }
