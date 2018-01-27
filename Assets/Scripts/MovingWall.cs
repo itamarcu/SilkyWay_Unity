@@ -7,7 +7,7 @@ public class MovingWall : MonoBehaviour
     public Vector2 pathVector;
     [Range(0f, 1f)] public float positionAlongLoop;
     [Range(0f, 5f)] public float speedInGridUnitsPerSecond;
-    [Range(0f, 2.5f)] public float rotationsPerSecond;
+    [Range(-2.5f, 2.5f)] public float rotationsPerSecond;
 
     private Vector2 birthPlace;
 
