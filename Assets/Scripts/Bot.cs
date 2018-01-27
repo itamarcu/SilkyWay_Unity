@@ -107,10 +107,10 @@ public class Bot : Transmitter
 
     public void BurnInLava()
     {
-        StartCoroutine(LavaBurnAnimation());
+        StartCoroutine(DeathCoroutine());
     }
 
-    private IEnumerator LavaBurnAnimation()
+    private IEnumerator DeathCoroutine()
     {
         // Disable
         isConnected = false;
@@ -178,5 +178,17 @@ public class Bot : Transmitter
     {
 		expectsSelection = false;
         selectionMark.enabled = false;
+    }
+
+    private int deepCollisionCounter = 0;
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        Debug.Log(collision.contacts[0].separation, this);
+        if (Mathf.Abs(collision.contacts[0].separation) > 0.05f)
+        {
+            //Crushed between walls
+            StartCoroutine(DeathCoroutine());
+        }
     }
 }

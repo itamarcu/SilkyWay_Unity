@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class MovingWall : MonoBehaviour
 {
-    public Vector2 pathVector;
+    private const float GRID_UNITS_IN_UNITY_UNITS = 0.7f;
+    public Vector2 pathVectorInGridUnits;
     [Range(0f, 1f)] public float positionAlongLoop;
     [Range(0f, 5f)] public float speedInGridUnitsPerSecond;
     [Range(-2.5f, 2.5f)] public float rotationsPerSecond;
@@ -24,9 +25,9 @@ public class MovingWall : MonoBehaviour
 
     private void Slide()
     {
-        positionAlongLoop = (positionAlongLoop + speedInGridUnitsPerSecond / pathVector.magnitude * Time.deltaTime) % 1;
-        Vector2 delta = (2 * positionAlongLoop - (int)(positionAlongLoop >= 0.5f)) * pathVector;
-        transform.position = birthPlace + delta;
+        positionAlongLoop = (positionAlongLoop + (1 / 2f * speedInGridUnitsPerSecond) / pathVector.magnitude * Time.deltaTime) % 1;
+        Vector2 delta = (0.5f - 0.5f * Mathf.Cos(positionAlongLoop * 2 * Mathf.PI)) * pathVectorInGridUnits;
+        transform.position = birthPlace + delta * MovingWall.GRID_UNITS_IN_UNITY_UNITS;
     }
 
     private void Rotate()
