@@ -6,7 +6,8 @@ public class MovingWall : MonoBehaviour
 {
     public Vector2 pathVector;
     [Range(0f, 1f)] public float positionAlongLoop;
-    public float speedInGridUnitsPerSeconds;
+    [Range(0f, 5f)] public float speedInGridUnitsPerSecond;
+    [Range(0f, 2.5f)] public float rotationsPerSecond;
 
     private Vector2 birthPlace;
 
@@ -17,18 +18,20 @@ public class MovingWall : MonoBehaviour
 
     private void Update()
     {
-        positionAlongLoop = (positionAlongLoop + speedInGridUnitsPerSeconds / pathVector.magnitude * Time.deltaTime) %
-                            1;
-        Vector2 delta;
-        if (positionAlongLoop < 0.5f)
-        {
-            delta = 2 * positionAlongLoop * pathVector;
-        }
-        else
-        {
-            delta = (2 * positionAlongLoop - 1) * pathVector;
-        }
+        Slide();
+        Rotate();
+    }
 
+    private void Slide()
+    {
+        positionAlongLoop = (positionAlongLoop + speedInGridUnitsPerSecond / pathVector.magnitude * Time.deltaTime) % 1;
+        Vector2 delta = (2 * positionAlongLoop - (int)(positionAlongLoop >= 0.5f)) * pathVector;
         transform.position = birthPlace + delta;
+    }
+
+    private void Rotate()
+    {
+        transform.rotation.z += 360f * rotationsPerSecond * Time.deltaTime;
+        transform.rotation.z %= 360;
     }
 }
