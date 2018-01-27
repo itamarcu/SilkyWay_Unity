@@ -107,18 +107,16 @@ public class SelectionManager : MonoBehaviour
 		{
 			if (gm.currentlySelectedBots.Count == 0)
 			{
+				CancelUnselectedBotsSelectionExpectation();
 				SelectBotAtRandom ();
 			}
 			else if (gm.currentlySelectedBots.Count > 1)
 			{
-				//Select "first bot in currently selected bots"
-				foreach (Bot bot in gm.currentlySelectedBots)
-				{
-					bot.SetNotSelected();
-				}
-
-				gm.currentlySelectedBots = new List<Bot> {gm.currentlySelectedBots[0]};
-				gm.currentlySelectedBots[0].SetSelected();
+				Bot bot = gm.currentlySelectedBots[0];
+				DeselectAllBots();
+				CancelUnselectedBotsSelectionExpectation();
+				gm.currentlySelectedBots.Add(bot);
+				bot.SetSelected();
 			}
 			else
 			{
@@ -169,7 +167,12 @@ public class SelectionManager : MonoBehaviour
 		{
 			bot.SetNotSelected();
 		}
+		gm.currentlySelectedBots.Clear();
 	}
+
+	/// <summary>
+	/// Winner of the 2018 "Best Function Name" award
+	/// </summary>
 	private void CancelUnselectedBotsSelectionExpectation()
 	{
 		foreach (Bot bot in gm.allBots) {
