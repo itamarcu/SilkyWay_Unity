@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Bot : Transmitter
@@ -16,20 +17,22 @@ public class Bot : Transmitter
     public Vector2 moveDirection;
     public Vector2 advisedFaceDirection;
     public SpriteRenderer selectionMark;
-	public bool expectsSelection;
+    public bool expectsSelection;
 
-	private Vector2 birthplace;
+    private Vector2 birthplace;
+    private HashSet<GameObject> deepCollisions;
 
     protected override void Awake()
     {
         base.Awake();
-		connectionDrawers = GetComponentsInChildren<ConnectionLine> ();
+        connectionDrawers = GetComponentsInChildren<ConnectionLine>();
         rig = GetComponent<Rigidbody2D>();
         skitterTimeLeft = Random.value * Bot.SKITTER_MOVE_PERIOD;
         advisedFaceDirection = Vector2.zero;
         transform.Rotate(Vector3.forward, Random.value * 360);
-		birthplace = transform.position;
+        birthplace = transform.position;
         connectionDrawers = gameObject.GetComponentsInChildren<ConnectionLine>();
+        deepCollisions = new HashSet<GameObject>();
     }
 
     private void Update()
@@ -48,8 +51,9 @@ public class Bot : Transmitter
                 bodyAnimator.SetBool("isMoving", false);
             }
 
-			if (skitterTimeLeft > Bot.SKITTER_MOVE_PERIOD && isConnected &&
-				!(GameManager.instance.currentlySelectedBots.Count == 1 && GameManager.instance.currentlySelectedBots.Contains(this)))
+            if (skitterTimeLeft > Bot.SKITTER_MOVE_PERIOD && isConnected &&
+                !(GameManager.instance.currentlySelectedBots.Count == 1 &&
+                  GameManager.instance.currentlySelectedBots.Contains(this)))
             {
                 rig.velocity = Vector2.zero;
                 bodyAnimator.SetBool("isMoving", false);
@@ -58,7 +62,7 @@ public class Bot : Transmitter
             for (int i = 0; i < connectionDrawers.Length; i++)
             {
                 if (connectedParents.Count <= i)
-                {                    
+                {
                     connectionDrawers[i].lineRenderer.enabled = false;
                 }
                 else
@@ -100,7 +104,7 @@ public class Bot : Transmitter
                 }
             }
         }
-        
+
         //Rotate selection mark
         selectionMark.transform.Rotate(Vector3.forward, Time.deltaTime * Bot.HALO_ROTATION_SPEED);
     }
@@ -140,7 +144,7 @@ public class Bot : Transmitter
         }
 
         // Teleport to spawn
-		transform.position = birthplace;
+        transform.position = birthplace;
 
         // Unspin and unshrink
         spinTimeLeft = 0.7f;
@@ -158,6 +162,7 @@ public class Bot : Transmitter
         {
             collider2.enabled = true;
         }
+
         isAlive = true;
         isConnected = true;
         wasConnectedPrevPulse = true;
@@ -168,27 +173,36 @@ public class Bot : Transmitter
         selectionMark.enabled = true;
         selectionMark.color = new Color(1f, 0.8f, 0f, 1.0f);
     }
+
     public void SetSelected()
     {
-		expectsSelection = true;
+        expectsSelection = true;
         selectionMark.enabled = true;
         selectionMark.color = new Color(1f, 0.6f, 0f, 0.8f);
     }
+
     public void SetNotSelected()
     {
-		expectsSelection = false;
+        expectsSelection = false;
         selectionMark.enabled = false;
     }
 
-    private int deepCollisionCounter = 0;
-
     private void OnCollisionStay2D(Collision2D collision)
     {
-        Debug.Log(collision.contacts[0].separation, this);
         if (Mathf.Abs(collision.contacts[0].separation) > 0.05f)
+        {
+            deepCollisions.Add(collision.gameObject);
+        }
+        if (deepCollisions.Count >= 2)
         {
             //Crushed between walls
             StartCoroutine(DeathCoroutine());
         }
+    }
+
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        if (deepCollisions.Contains(other.gameObject))
+            deepCollisions.Remove(other.gameObject);
     }
 }
