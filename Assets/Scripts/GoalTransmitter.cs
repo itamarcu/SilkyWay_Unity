@@ -33,8 +33,13 @@ public class GoalTransmitter : Transmitter
 
         if (timeSinceSignalMaintainStarted >= signalMaintenanceTimeNeeded)
         {
-            Object.FindObjectOfType<GameManager>().EndLevel();
+            OnTrigger();
         }
+    }
+
+    protected virtual void OnTrigger()
+    {
+        Object.FindObjectOfType<GameManager>().EndLevel();
     }
 
     private void RenderGoalSignal()

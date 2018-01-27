@@ -119,4 +119,10 @@ public class GameManager : MonoBehaviour
         // TODO some congratulatory message
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
+
+    public void EnterLevel(int levelID)
+    {
+        // TODO some congratulatory message
+        SceneManager.LoadScene(levelID);
+    }
 }
