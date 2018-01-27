@@ -189,10 +189,11 @@ public class Bot : Transmitter
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (Mathf.Abs(collision.contacts[0].separation) > 0.05f)
+        if (collision.contacts.Length > 0 && Mathf.Abs(collision.contacts[0].separation) > 0.05f)
         {
             deepCollisions.Add(collision.gameObject);
         }
+
         if (deepCollisions.Count >= 2)
         {
             //Crushed between walls
